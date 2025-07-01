@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  api-gateway:
+    image: backend/api-gateway
+    build:
+      context: ./api-gateway/gateway
+    container_name: backend-api_gateway
+    ports:
+      - "8000:8000"
+    depends_on:
+      - identify-service
+    networks:
+      - microservice-network
+
+  identify-service:
+    image: backend/identify-service
+    build:
+      context: ./identify/identifyService
+    container_name: backend-identify-service
+    ports:
+      - "8080:8080"
+    networks:
+      - microservice-network
+volumes:
+  db-data:
+networks:
+  microservice-network:

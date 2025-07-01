@@ -1,0 +1,24 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /identify
+spring:
+  application:
+    name: identify-service
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: ${URL_DB}
+    username: ${USERNAME_DB}
+    password: ${PASSWORD_DB}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+jwt:
+  signerKey: ${SIGNER_KEY}
+  valid_duration: 3600
+
+logging:
+  level:
+    org.springframework.security: DEBUG

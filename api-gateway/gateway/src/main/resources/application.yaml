@@ -1,0 +1,26 @@
+server:
+  port: 8000
+app:
+  api-prefix: /api/v1
+
+#logging:
+#  level:
+#    # Bật log DEBUG cho toàn bộ Spring Cloud Gateway
+#    org.springframework.cloud.gateway: DEBUG
+#    # Bật log DEBUG cho các predicate và filter
+#    org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: DEBUG
+#    # Bật log DEBUG cho các yêu cầu HTTP đi ra từ Gateway
+#    reactor.netty.http.client: DEBUG
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: identify-service
+          uri: http://identify-service:8080
+          predicates:
+            - Path=${app.api-prefix}/identify/**
+          filters:
+            - StripPrefix=2
