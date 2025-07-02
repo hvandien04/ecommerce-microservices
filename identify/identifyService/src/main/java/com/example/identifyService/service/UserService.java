@@ -1,16 +1,24 @@
 package com.example.identifyService.service;
 
+import com.example.identifyService.dto.request.IntrospectRequest;
 import com.example.identifyService.dto.request.UserCreateRequest;
+import com.example.identifyService.dto.request.UserUpdatePasswordRequest;
+import com.example.identifyService.dto.request.UserUpdateRequest;
 import com.example.identifyService.dto.response.UserResponse;
 import com.example.identifyService.entity.User;
 import com.example.identifyService.exception.AppException;
 import com.example.identifyService.exception.ErrorCode;
 import com.example.identifyService.mapper.UserMapper;
 import com.example.identifyService.repository.UserRepository;
+import com.nimbusds.jose.JOSEException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.time.Instant;
 
 @Service
@@ -19,11 +27,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final IdGeneratorService idGeneratorService;
-    private final PasswordEncoder passwordEncoder;
 
     public UserResponse CreateUser(UserCreateRequest userCreateRequest) {
         System.out.println(userCreateRequest.getUsername());
         User user = userMapper.toUser(userCreateRequest);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         user.setUserId(idGeneratorService.generateRandomId("US", userRepository::existsById));
         user.setPassword(passwordEncoder.encode(userCreateRequest.getPassword()));
         System.out.println(user.getUsername());
@@ -31,8 +39,29 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    public UserResponse getUserById(String userId) {
-        return userMapper.toUserResponse(userRepository.findById(userId).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND)));
+    @PostAuthorize("returnObject.username==authentication.name")
+    public UserResponse CheckMyInfo(){
+        var username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+        return userMapper.toUserResponse(user);
     }
 
+    public String UpdatePassword(UserUpdatePasswordRequest request) {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        var username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new AppException(ErrorCode.WRONG_PASSWORD);
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        return "Change password successfully";
+    }
+
+    public UserResponse UpdateUser(UserUpdateRequest request) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+        userMapper.updateUser(user, request);
+        return userMapper.toUserResponse(userRepository.save(user));
+    }
 }

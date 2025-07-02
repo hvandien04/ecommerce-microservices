@@ -7,7 +7,10 @@ import com.example.identifyService.dto.response.AuthenticationResponse;
 import com.example.identifyService.dto.response.IntrospectResponse;
 import com.example.identifyService.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,9 +25,17 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping
-    ApiResponse<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
+    ApiResponse<AuthenticationResponse> login(@RequestBody AuthenticationRequest request, HttpServletResponse response) {
+        AuthenticationResponse authenticationResponse = authenticationService.authenticate(request);
+        ResponseCookie cookie = ResponseCookie.from("token", authenticationResponse.getToken())
+                .secure(false)
+                .httpOnly(true)
+                .path("/")
+                .maxAge(30*24*60*60)
+                .build();
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return ApiResponse.<AuthenticationResponse>builder()
-                .result(authenticationService.authenticate(request))
+                .result(authenticationResponse)
                 .build();
     }
 
@@ -34,6 +45,13 @@ public class AuthenticationController {
         var result = authenticationService.introspect(request);
         return ApiResponse.<IntrospectResponse>builder()
                 .result(result)
+                .build();
+    }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody IntrospectRequest request) throws ParseException, JOSEException {
+        authenticationService.Logout(request);
+        return ApiResponse.<Void>builder()
                 .build();
     }
 }

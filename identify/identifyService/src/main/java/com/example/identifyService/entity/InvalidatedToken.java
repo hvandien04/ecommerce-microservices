@@ -5,8 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
-
-import java.time.Instant;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -21,6 +20,6 @@ public class InvalidatedToken {
     private String id;
 
     @Column(name = "expiry_time")
-    private Instant expiryTime;
+    private Date expiryTime;
 
 }

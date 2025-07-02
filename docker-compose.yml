@@ -9,8 +9,6 @@ services:
       - "8000:8000"
     depends_on:
       - identify-service
-    networks:
-      - microservice-network
 
   identify-service:
     image: backend/identify-service
@@ -19,9 +17,5 @@ services:
     container_name: backend-identify-service
     ports:
       - "8080:8080"
-    networks:
-      - microservice-network
 volumes:
   db-data:
-networks:
-  microservice-network:

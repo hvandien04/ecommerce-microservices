@@ -1,6 +1,8 @@
 package com.example.identifyService.controller;
 
 import com.example.identifyService.dto.request.UserCreateRequest;
+import com.example.identifyService.dto.request.UserUpdatePasswordRequest;
+import com.example.identifyService.dto.request.UserUpdateRequest;
 import com.example.identifyService.dto.response.ApiResponse;
 import com.example.identifyService.dto.response.UserResponse;
 import com.example.identifyService.service.UserService;
@@ -19,10 +21,25 @@ public class UserController {
                 .build();
     }
 
-    @GetMapping("/{userId}")
-    ApiResponse<UserResponse> getUserById(@PathVariable String userId) {
+    @GetMapping
+    ApiResponse<UserResponse> getMyInfo() {
         return ApiResponse.<UserResponse>builder()
-                .result(userService.getUserById(userId))
+                .result(userService.CheckMyInfo())
                 .build();
     }
+
+    @PutMapping
+    ApiResponse<UserResponse> updateUser(@RequestBody UserUpdateRequest request) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.UpdateUser(request))
+                .build();
+    }
+
+    @PutMapping("/update-password")
+    ApiResponse<String> updatePassword(@RequestBody UserUpdatePasswordRequest request){
+        return ApiResponse.<String>builder()
+                .message(userService.UpdatePassword(request))
+                .build();
+    }
+
 }

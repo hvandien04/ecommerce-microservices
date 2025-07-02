@@ -4,6 +4,7 @@ import com.example.identifyService.dto.request.AuthenticationRequest;
 import com.example.identifyService.dto.request.IntrospectRequest;
 import com.example.identifyService.dto.response.AuthenticationResponse;
 import com.example.identifyService.dto.response.IntrospectResponse;
+import com.example.identifyService.entity.InvalidatedToken;
 import com.example.identifyService.entity.User;
 import com.example.identifyService.exception.AppException;
 import com.example.identifyService.exception.ErrorCode;
@@ -17,6 +18,7 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +33,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final InvalidatedTokenRepository invalidatedTokenRepository;
 
@@ -39,8 +40,10 @@ public class AuthenticationService {
     @Value("${jwt.signerKey}")
     protected String SIGNER_KEY;
 
+
     public AuthenticationResponse authenticate(AuthenticationRequest request){
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new AppException(ErrorCode.WRONG_PASSWORD);
         }
@@ -49,6 +52,17 @@ public class AuthenticationService {
                 .authenticated(true)
                 .build();
 
+    }
+
+    public void Logout(IntrospectRequest request) throws ParseException, JOSEException {
+        var signToken = verifyToken(request.getToken(),false);
+        String accessTokenId = signToken.getJWTClaimsSet().getJWTID();
+        Date accessTokenExpiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+        InvalidatedToken invalidatedToken= InvalidatedToken.builder()
+                .id(accessTokenId)
+                .expiryTime(accessTokenExpiryTime)
+                .build();
+        invalidatedTokenRepository.save(invalidatedToken);
     }
 
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {

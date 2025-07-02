@@ -1,6 +1,8 @@
 package com.example.identifyService.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +22,10 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CustomJwtDecoder customJwtDecoder;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -32,7 +37,10 @@ public class SecurityConfig {
             "/auth/register",
             "/auth/introspect",
             "/users",
-            "/users/**"
+            "/users/**",
+            "/v3/api-docs/**",
+            "/swagger-ui.html",
+            "/swagger-ui/**"
     };
 
     @Bean
@@ -41,7 +49,7 @@ public class SecurityConfig {
                 .requestMatchers(PUBLIC_URLS).permitAll()
                 .anyRequest().authenticated());
         http.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwt -> jwt.decoder(jwtDecoder()))
+                oauth2.jwt(jwt -> jwt.decoder(customJwtDecoder))
         );
         http.cors(withDefaults());
         http.csrf(AbstractHttpConfigurer::disable);
