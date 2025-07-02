@@ -3,7 +3,7 @@ services:
   api-gateway:
     image: backend/api-gateway
     build:
-      context: ./api-gateway/gateway
+      context: ./api-gateway
     container_name: backend-api_gateway
     ports:
       - "8000:8000"
@@ -13,7 +13,7 @@ services:
   identify-service:
     image: backend/identify-service
     build:
-      context: ./identify/identifyService
+      context: ./identify
     container_name: backend-identify-service
     ports:
       - "8080:8080"
