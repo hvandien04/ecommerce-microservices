@@ -24,3 +24,9 @@ spring:
             - Path=${app.api-prefix}/identify/**
           filters:
             - StripPrefix=2
+        - id: product-service
+          uri: http://product-service:8081
+          predicates:
+            - Path=${app.api-prefix}/product/**
+          filters:
+            - StripPrefix=2

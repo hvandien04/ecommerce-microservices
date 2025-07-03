@@ -13,9 +13,16 @@ services:
   identify-service:
     image: backend/identify-service
     build:
-      context: ./identify
+      context: ./identify-service
     container_name: backend-identify-service
     ports:
       - "8080:8080"
+  product-service:
+    image: backend/product-service
+    build:
+      context: ./product-service
+    container_name: backend-product-service
+    ports:
+      - "8081:8081"
 volumes:
   db-data:
