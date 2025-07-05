@@ -16,7 +16,7 @@ public class ProductResponse {
     private String description;
     private BigDecimal price;
     private Integer stock;
-    private Category category;
+    private String categoryName;
     private List<ProductImageResponse> productImages;
     private List<ProductAttributeResponse> productAttributes;
 }

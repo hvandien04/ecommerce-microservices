@@ -1,4 +1,4 @@
-package com.example.productService.dto.response;
+package com.example.productService.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductImageResponse {
-    private String id;
+public class ProductImageRequest {
     private String imageUrl;
 }

@@ -12,6 +12,14 @@ app:
 #    # Bật log DEBUG cho các yêu cầu HTTP đi ra từ Gateway
 #    reactor.netty.http.client: DEBUG
 
+springdoc:
+  swagger-ui:
+    urls:
+      - name: identify-service
+        url: ${app.api-prefix}/identify/v3/api-docs
+      - name: product-service
+        url: ${app.api-prefix}/product/v3/api-docs
+
 spring:
   application:
     name: api-gateway
@@ -30,3 +38,7 @@ spring:
             - Path=${app.api-prefix}/product/**
           filters:
             - StripPrefix=2
+        - id: cart-service
+          uri: http://cart-service:8082
+          predicates:
+            - Path=${app.api-prefix}/cart/**

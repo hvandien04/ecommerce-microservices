@@ -1,6 +1,7 @@
 package com.example.productService.controller;
 
 import com.example.productService.dto.request.ProductRequest;
+import com.example.productService.dto.request.ProductUpdateRequest;
 import com.example.productService.dto.response.ApiResponse;
 import com.example.productService.dto.response.ProductResponse;
 import com.example.productService.service.ProductService;
@@ -40,9 +41,16 @@ public class ProductController {
     }
 
     @PutMapping("/{productId}")
-    ApiResponse<ProductResponse> updateProduct(@PathVariable String productId, @RequestBody ProductRequest request){
+    ApiResponse<ProductResponse> updateProduct(@PathVariable String productId, @RequestBody ProductUpdateRequest request){
         return ApiResponse.<ProductResponse>builder()
                 .result(productService.updateProduct(productId,request))
+                .build();
+    }
+
+    @DeleteMapping("/{productId}")
+    ApiResponse<String> deleteProduct(@PathVariable String productId){
+        return ApiResponse.<String>builder()
+                .message(productService.deleteProduct(productId))
                 .build();
     }
 }

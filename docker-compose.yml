@@ -9,6 +9,8 @@ services:
       - "8000:8000"
     depends_on:
       - identify-service
+      - product-service
+      - cart-service
 
   identify-service:
     image: backend/identify-service
@@ -24,5 +26,12 @@ services:
     container_name: backend-product-service
     ports:
       - "8081:8081"
+  cart-service:
+    image: backend/cart-service
+    build:
+      context: ./cart-service
+    container_name: backend-cart-service
+    ports:
+      - "8082:8082"
 volumes:
   db-data:

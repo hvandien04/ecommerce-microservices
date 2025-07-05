@@ -26,4 +26,7 @@ public class Category {
     @Column(name = "slug", length = 100)
     private String slug;
 
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<Product> products;
+
 }

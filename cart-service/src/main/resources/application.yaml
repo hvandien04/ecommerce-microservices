@@ -1,15 +1,16 @@
 server:
-  port: 8081
+  port: 8082
   servlet:
-    context-path: /product
+    context-path: /cart
 spring:
   application:
-    name: product-service
+    name: cart-service
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
     url: ${URL_DB}
     username: ${USERNAME_DB}
     password: ${PASSWORD_DB}
-#  jpa:
-#    hibernate:
-##      ddl-auto: update
+
+app:
+  service:
+    product: http://product-service:8081

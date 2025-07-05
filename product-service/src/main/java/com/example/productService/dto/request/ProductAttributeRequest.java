@@ -1,4 +1,4 @@
-package com.example.productService.dto.response;
+package com.example.productService.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 
 @Builder
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class ProductAttributeResponse {
-    private String productAttributesId;
+@NoArgsConstructor
+public class ProductAttributeRequest {
     private String key;
     private String value;
 }

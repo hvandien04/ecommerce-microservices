@@ -1,8 +1,5 @@
 package com.example.productService.dto.request;
 
-import com.example.productService.entity.Category;
-import com.example.productService.entity.ProductAttribute;
-import com.example.productService.entity.ProductImage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,12 +12,10 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductRequest {
+public class ProductUpdateRequest {
     private String name;
     private String description;
     private BigDecimal price;
     private Integer stock;
     private String categoriesId;
-    private List<ProductAttributeRequest> Attributes;
-    private List<ProductImageRequest> images;
 }
