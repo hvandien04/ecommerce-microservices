@@ -2,6 +2,7 @@ package com.example.productService.service;
 
 import com.example.productService.dto.request.ProductRequest;
 import com.example.productService.dto.request.ProductUpdateRequest;
+import com.example.productService.dto.request.ProductsIdRequest;
 import com.example.productService.dto.response.ProductResponse;
 import com.example.productService.entity.Category;
 import com.example.productService.entity.Product;
@@ -73,14 +74,19 @@ public class ProductService {
         return productMapper.toProductResponse(productRepository.save(product));
     }
 
+    public List<ProductResponse> getProductByProductId(ProductsIdRequest request){
+        return productRepository.findAllById(request.getProductsId()).stream().map(productMapper::toProductResponse).toList();
+    }
+
     public List<ProductResponse> getProductByCategoryId(String categoryId){
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         return productRepository.findAllByCategory(category).stream().map(productMapper::toProductResponse).toList();
     }
 
     public String deleteProduct(String productId){
-        Product product = productRepository.findById(productId)
+            productRepository.findById(productId)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+            productRepository.deleteById(productId);
         return productId + " deleted";
     }
 }

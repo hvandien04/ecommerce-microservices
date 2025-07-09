@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.*;
 public class ImageController {
     private final ImageService imageService;
 
-    @PostMapping
-    ApiResponse<String> createImage(String productId, ProductImageRequest imageUrl){
+    @PostMapping("/{productId}")
+    ApiResponse<String> createImage(@PathVariable String productId, @RequestBody ProductImageRequest imageUrl){
         return ApiResponse.<String>builder()
                 .message(imageService.createImage(productId,imageUrl))
                 .build();

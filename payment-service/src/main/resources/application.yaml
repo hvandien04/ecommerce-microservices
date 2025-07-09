@@ -1,0 +1,22 @@
+server:
+  port: 8084
+  servlet:
+    context-path: /payment
+spring:
+  application:
+    name: payment-service
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: ${URL_DB}
+    username: ${USERNAME_DB}
+    password: ${PASSWORD_DB}
+
+  kafka:
+    bootstrap-servers: kafka:9094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+app:
+  service:
+    order: http://order-service:8083

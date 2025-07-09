@@ -2,6 +2,7 @@ package com.example.productService.controller;
 
 import com.example.productService.dto.request.ProductRequest;
 import com.example.productService.dto.request.ProductUpdateRequest;
+import com.example.productService.dto.request.ProductsIdRequest;
 import com.example.productService.dto.response.ApiResponse;
 import com.example.productService.dto.response.ProductResponse;
 import com.example.productService.service.ProductService;
@@ -29,6 +30,13 @@ public class ProductController {
     ApiResponse<ProductResponse> getProduct(@PathVariable String productId){
         return ApiResponse.<ProductResponse>builder()
                 .result(productService.getProduct(productId))
+                .build();
+    }
+
+    @PostMapping("/batch")
+    ApiResponse<List<ProductResponse>> getProductByProductId(@RequestBody ProductsIdRequest request){
+        return ApiResponse.<List<ProductResponse>>builder()
+                .result(productService.getProductByProductId(request))
                 .build();
     }
 

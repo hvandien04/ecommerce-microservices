@@ -11,7 +11,8 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(1001, "Category not found", HttpStatus.NOT_FOUND),
     PRODUCT_NOT_FOUND(1002, "Product not found", HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(1003, "Unauthenticated" , HttpStatus.UNAUTHORIZED ),
-    STOCK_NOT_ENOUGH(1004, "Stock not enough", HttpStatus.BAD_REQUEST)
+    STOCK_NOT_ENOUGH(1004, "Stock not enough", HttpStatus.BAD_REQUEST),
+    DEFECTIVE_PRODUCT(1005, "Product defective", HttpStatus.BAD_REQUEST)
     ;
 
     private final Integer code;

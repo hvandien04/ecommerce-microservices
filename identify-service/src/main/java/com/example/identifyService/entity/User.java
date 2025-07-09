@@ -1,6 +1,7 @@
 package com.example.identifyService.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.Instant;
@@ -21,6 +22,7 @@ public class User {
     private String username;
 
     @Column(name = "password", nullable = false)
+    @Size(min = 8, message = "PASSWORD_MINIMUM")
     private String password;
 
     @Column(name = "full_name", length = 100)

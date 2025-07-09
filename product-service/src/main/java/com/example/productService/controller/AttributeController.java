@@ -13,7 +13,7 @@ public class AttributeController {
     private final AttributeService attributeService;
 
     @PostMapping("/{ProductId}")
-    ApiResponse<String> createAttribute(@PathVariable String ProductId, ProductAttributeRequest request){
+    ApiResponse<String> createAttribute(@PathVariable String ProductId,@RequestBody ProductAttributeRequest request){
         return ApiResponse.<String>builder()
                 .message(attributeService.CreateAttribute(ProductId,request))
                 .build();

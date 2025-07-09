@@ -34,8 +34,7 @@ public class UserService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         user.setUserId(idGeneratorService.generateRandomId("US", userRepository::existsById));
         user.setPassword(passwordEncoder.encode(userCreateRequest.getPassword()));
-        System.out.println(user.getUsername());
-        System.out.println(Instant.now());
+        user.setRole("USER");
         return userMapper.toUserResponse(userRepository.save(user));
     }
 

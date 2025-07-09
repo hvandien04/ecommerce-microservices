@@ -10,7 +10,8 @@ public enum ErrorCode {
     UNAUTHORIZED(1000, "You do not have permission", HttpStatus.FORBIDDEN),
     USER_NOT_FOUND(1001, "User not found", HttpStatus.NOT_FOUND),
     WRONG_PASSWORD(1002,"Password is wrong" ,HttpStatus.BAD_REQUEST ),
-    UNAUTHENTICATED(1003, "Unauthenticated" , HttpStatus.UNAUTHORIZED ),;
+    UNAUTHENTICATED(1003, "Unauthenticated" , HttpStatus.UNAUTHORIZED ),
+    PASSWORD_MINIMUM(1004, "Password minimum 8 characters" , HttpStatus.BAD_REQUEST );
 
     private final Integer code;
     private final String message;

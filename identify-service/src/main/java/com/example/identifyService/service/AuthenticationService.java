@@ -106,6 +106,7 @@ public class AuthenticationService {
                 .expirationTime(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)))
                 .claim("scope",buildScope(user))
                 .claim("type","access_token")
+                .claim("userId",user.getUserId())
                 .build();
         Payload payload = new Payload(claimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header, payload);

@@ -1,5 +1,20 @@
 version: '3.8'
 services:
+  kafka:
+    image: 'bitnami/kafka:3.8.0'
+    container_name: kafka
+    hostname: kafka
+    restart: always
+    ports:
+      - '9094:9094'
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://kafka:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
   api-gateway:
     image: backend/api-gateway
     build:
@@ -8,9 +23,11 @@ services:
     ports:
       - "8000:8000"
     depends_on:
+      - kafka
       - identify-service
       - product-service
       - cart-service
+      - order-service
 
   identify-service:
     image: backend/identify-service
@@ -33,5 +50,19 @@ services:
     container_name: backend-cart-service
     ports:
       - "8082:8082"
+  order-service:
+    image: backend/order-service
+    build:
+      context: ./order-service
+    container_name: backend-order-service
+    ports:
+      - "8083:8083"
+  payment-service:
+    image: backend/payment-service
+    build:
+      context: ./payment-service
+    container_name: backend-payment-service
+    ports:
+      - "8084:8084"
 volumes:
   db-data:

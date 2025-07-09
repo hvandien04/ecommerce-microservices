@@ -1,6 +1,5 @@
 package com.example.productService.dto.response;
 
-import com.example.productService.entity.Category;
 import lombok.*;
 
 import java.math.BigDecimal;

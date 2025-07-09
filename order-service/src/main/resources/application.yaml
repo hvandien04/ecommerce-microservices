@@ -1,0 +1,26 @@
+server:
+  port: 8083
+  servlet:
+    context-path: /order
+spring:
+  application:
+    name: order-service
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: ${URL_DB}
+    username: ${USERNAME_DB}
+    password: ${PASSWORD_DB}
+  kafka:
+    bootstrap-servers: kafka:9094
+    consumer:
+      group-id: order-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+app:
+  service:
+    product: http://product-service:8081
