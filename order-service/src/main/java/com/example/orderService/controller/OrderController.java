@@ -41,4 +41,12 @@ public class OrderController {
         orderService.updateOrderStatus(OrderId);
     }
 
+    @GetMapping("/status/{ProductId}")
+    public ApiResponse<Boolean> getOrderStatus(@PathVariable String ProductId){
+        return ApiResponse.<Boolean>builder()
+                .result(orderService.getOrderStatusByProductId(ProductId))
+                .build();
+
+    }
+
 }

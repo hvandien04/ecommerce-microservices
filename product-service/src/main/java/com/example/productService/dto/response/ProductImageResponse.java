@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class ProductImageResponse {
     private String id;
     private String imageUrl;
+    private Boolean isMain;
 }

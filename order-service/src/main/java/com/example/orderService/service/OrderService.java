@@ -15,6 +15,7 @@ import com.example.orderService.repository.OrderItemRepository;
 import com.example.orderService.repository.OrderRepository;
 import com.example.orderService.repository.ShippingAddressRepository;
 import com.example.orderService.repository.httpClient.ProductClient;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -106,5 +107,12 @@ public class OrderService {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
         order.setStatus("PAID");
         orderRepository.save(order);
+    }
+
+    public Boolean getOrderStatusByProductId(String productId) {
+        String userId = getUserId();
+        Order order = orderRepository.checkOrderStatus(productId, userId).orElseThrow(()-> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        return order.getStatus().equals("SUCCESS");
+
     }
 }

@@ -42,3 +42,15 @@ spring:
             - Path=${app.api-prefix}/order/**
           filters:
             - StripPrefix=2
+        - id: payment-service
+          uri: http://payment-service:8084
+          predicates:
+            - Path=${app.api-prefix}/payment/**
+          filters:
+            - StripPrefix=2
+        - id: review-service
+          uri: http://review-service:8085
+          predicates:
+            - Path=${app.api-prefix}/review/**
+          filters:
+            - StripPrefix=2

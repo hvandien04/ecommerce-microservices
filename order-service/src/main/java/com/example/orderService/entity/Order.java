@@ -32,10 +32,13 @@ public class Order {
     @Column(name = "total_amount", precision = 12, scale = 2)
     private BigDecimal totalAmount;
 
+//    @Column(name = "shipping_fee", precision = 12, scale = 2)
+//    private BigDecimal shippingFee;
+
     @Column(name = "created_at")
     private Instant createdAt;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY
     @JoinColumn(name = "order_id")
     private List<OrderItem> orderItems;
 

@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   kafka:
     image: 'bitnami/kafka:3.8.0'
@@ -64,5 +63,12 @@ services:
     container_name: backend-payment-service
     ports:
       - "8084:8084"
+  review-service:
+    image: backend/review-service
+    build:
+      context: ./review-service
+    container_name: backend-review-service
+    ports:
+      - "8085:8085"
 volumes:
   db-data:

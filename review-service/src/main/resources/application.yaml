@@ -1,0 +1,16 @@
+server:
+  port: 8085
+  servlet:
+    context-path: /review
+spring:
+  application:
+    name: review-service
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: ${URL_DB}
+    username: ${USERNAME_DB}
+    password: ${PASSWORD_DB}
+
+app:
+  service:
+    order: http://order-service:8083

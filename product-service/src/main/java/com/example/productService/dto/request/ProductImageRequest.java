@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProductImageRequest {
     private String imageUrl;
+    private Boolean isMain;
 }
