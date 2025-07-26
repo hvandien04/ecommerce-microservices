@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Chat UI</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #sidebar {
+      width: 300px;
+      border-right: 1px solid #ccc;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    #chatBox {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #chatMessages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column-reverse;
+    }
+
+    .message {
+      max-width: 70%;
+      margin: 4px 0;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .admin {
+      background-color: #e0f7fa;
+      align-self: flex-end;
+    }
+
+    .user {
+      background-color: #f1f1f1;
+      align-self: flex-start;
+    }
+
+    #chatInput {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+    }
+
+    #chatInput input {
+      flex: 1;
+      padding: 6px;
+    }
+
+    #chatInput button {
+      padding: 6px 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <h3>JWT</h3>
+    <input id="jwt" style="width: 100%" placeholder="Nhập JWT" />
+    <button onclick="connect()">Kết nối</button>
+    <hr />
+    <h3>Hội thoại</h3>
+    <ul id="conversationList"></ul>
+  </div>
+
+  <div id="chatBox">
+    <div id="chatMessages" onscroll="onScroll()"></div>
+    <div id="chatInput">
+      <input id="replyInput" placeholder="Nhập tin nhắn..." />
+      <button onclick="sendReply()">Gửi</button>
+    </div>
+  </div>
+
+  <script>
+    let stompClient = null;
+    let jwtToken = "";
+    let currentConversationId = "";
+    let currentPage = 0;
+    let currentUserId = "";
+    const size = 20;
+    let isLoading = false;
+
+    function connect() {
+      jwtToken = document.getElementById("jwt").value.trim();
+      if (!jwtToken) return alert("Nhập JWT!");
+
+      const socket = new SockJS("http://localhost:8086/chat/ws");
+      stompClient = Stomp.over(socket);
+
+      stompClient.connect({ Authorization: "Bearer " + jwtToken }, () => {
+        alert("✅ Đã kết nối");
+        subscribe();
+        loadConversations();
+      });
+    }
+
+    function subscribe() {
+      stompClient.subscribe("/topic/admin-inbox", (message) => {
+        const msg = JSON.parse(message.body);
+        if (msg.conversationId === currentConversationId) {
+          prependMessage(msg, "user");
+        }
+      }, { Authorization: "Bearer " + jwtToken });
+    }
+
+    function loadConversations() {
+      fetch(`http://localhost:8000/api/v1/chat/message/list?page=0&size=50`, {
+        headers: { Authorization: "Bearer " + jwtToken },
+      })
+        .then(res => res.json())
+        .then(data => {
+          const ul = document.getElementById("conversationList");
+          ul.innerHTML = "";
+          data.result.forEach(msg => {
+            const li = document.createElement("li");
+            li.textContent = msg.user.fullName;
+            li.style.cursor = "pointer";
+            li.onclick = () => openConversation(msg.conversationId, msg.user.userId);
+            ul.appendChild(li);
+          });
+        });
+    }
+
+    function openConversation(conversationId, userId) {
+      currentConversationId = conversationId;
+      currentUserId = userId;
+      currentPage = 0;
+      document.getElementById("chatMessages").innerHTML = "";
+      loadMessages();
+    }
+
+    function loadMessages() {
+      if (isLoading) return;
+      isLoading = true;
+      fetch(`http://localhost:8000/api/v1/chat/message/${currentConversationId}?page=${currentPage}&size=${size}`, {
+        headers: { Authorization: "Bearer " + jwtToken },
+      })
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById("chatMessages");
+          data.result.forEach(msg => {
+            const senderType = msg.senderId === "admin" ? "admin" : "user";
+            prependMessage(msg, senderType, true);
+          });
+          currentPage++;
+          isLoading = false;
+        });
+    }
+
+    function prependMessage(msg, type, prepend = false) {
+      const container = document.getElementById("chatMessages");
+      const div = document.createElement("div");
+      div.className = `message ${type}`;
+      div.textContent = msg.content;
+      if (prepend) container.appendChild(div);
+      else container.insertBefore(div, container.firstChild);
+    }
+
+    function onScroll() {
+      const container = document.getElementById("chatMessages");
+      if (container.scrollTop === 0) {
+        loadMessages();
+      }
+    }
+
+    function sendReply() {
+      const content = document.getElementById("replyInput").value.trim();
+       if (!content || !currentConversationId || !currentUserId) return;
+
+      const msg = {
+        content: content,
+        toUserId: currentUserId,
+        toConversationId: currentConversationId
+      };
+
+      stompClient.send("/app/chat", {}, JSON.stringify(msg));
+      prependMessage({ content }, "admin");
+      document.getElementById("replyInput").value = "";
+    }
+  </script>
+</body>
+</html>

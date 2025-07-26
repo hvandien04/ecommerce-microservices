@@ -54,3 +54,9 @@ spring:
             - Path=${app.api-prefix}/review/**
           filters:
             - StripPrefix=2
+        - id: chat-service
+          uri: http://chat-service:8086
+          predicates:
+            - Path=${app.api-prefix}/chat/**
+          filters:
+            - StripPrefix=2

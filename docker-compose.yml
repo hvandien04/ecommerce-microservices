@@ -70,5 +70,12 @@ services:
     container_name: backend-review-service
     ports:
       - "8085:8085"
+  chat-service:
+    image: backend/chat-service
+    build:
+      context: ./chat-service
+    container_name: backend-chat-service
+    ports:
+      - "8086:8086"
 volumes:
   db-data:

@@ -1,0 +1,15 @@
+server:
+  port: 8086
+  servlet:
+    context-path: /chat
+spring:
+  application:
+    name: chat-service
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: ${URL_DB}
+    username: ${USERNAME_DB}
+    password: ${PASSWORD_DB}
+app:
+  identify:
+    url: http://identify-service:8080

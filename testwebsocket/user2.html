@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>User Chat</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    #chatBox {
+      height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #messages {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .message {
+      padding: 6px 10px;
+      border-radius: 10px;
+      max-width: 70%;
+      word-break: break-word;
+    }
+
+    .user {
+      background-color: #d0f0ff;
+      align-self: flex-end;
+    }
+
+    .admin {
+      background-color: #f3f3f3;
+      align-self: flex-start;
+    }
+  </style>
+</head>
+<body>
+  <h2>👤 Giao diện Người dùng (User2)</h2>
+
+  <label>JWT Token:</label><br>
+  <input id="jwt" style="width: 400px;" placeholder="Nhập token JWT"><br><br>
+
+  <button onclick="connect()">Kết nối</button>
+  <button onclick="subscribe()">Subscribe</button><br><br>
+
+  <label>Nội dung gửi tới admin:</label><br>
+  <input id="messageInput" style="width: 300px;">
+  <button onclick="sendMessage()">Gửi</button>
+
+  <h3>Tin nhắn:</h3>
+  <div id="chatBox">
+    <ul id="messages"></ul>
+  </div>
+
+  <script>
+    let stompClient = null;
+    let page = 0;
+    const size = 20;
+    const conversationId = "conv-DA8EB"; // chỉnh đúng hội thoại
+    let token = "";
+
+    function connect() {
+      token = document.getElementById("jwt").value.trim();
+      if (!token) return alert("Vui lòng nhập token!");
+
+      const socket = new SockJS("http://localhost:8086/chat/ws");
+      stompClient = Stomp.over(socket);
+
+      stompClient.connect({ Authorization: "Bearer " + token }, () => {
+        alert("✅ Đã kết nối");
+        loadMessages(); // tải tin nhắn đầu tiên
+      }, error => {
+        alert("❌ Kết nối thất bại: " + error);
+      });
+    }
+
+    function subscribe() {
+      stompClient.subscribe("/user/queue/messages", (message) => {
+        const msg = JSON.parse(message.body);
+        appendMessage(msg);
+      });
+    }
+
+    function sendMessage() {
+      const content = document.getElementById("messageInput").value.trim();
+      if (!content) return;
+
+      const msg = {
+        content: content,
+        toUserId: null
+      };
+
+      stompClient.send("/app/chat", {}, JSON.stringify(msg));
+      document.getElementById("messageInput").value = "";
+    }
+
+    function handleScroll() {
+      const chatBox = document.getElementById("chatBox");
+      if (chatBox.scrollTop === 0) {
+        loadMessages();
+      }
+    }
+
+    function loadMessages() {
+      fetch(`http://localhost:8000/api/v1/chat/message/${conversationId}?page=${page}&size=${size}`, {
+        headers: {
+          "Authorization": "Bearer " + token
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.result || data.result.length === 0) return;
+
+        const oldHeight = document.getElementById("chatBox").scrollHeight;
+
+        data.result.forEach(prependMessage); // dữ liệu theo sentAt DESC
+
+        page++;
+
+        // giữ nguyên vị trí scroll sau khi prepend
+        const newHeight = document.getElementById("chatBox").scrollHeight;
+        document.getElementById("chatBox").scrollTop += newHeight - oldHeight;
+      })
+      .catch(err => console.error("❌ Lỗi khi tải tin nhắn:", err));
+    }
+
+    function prependMessage(msg) {
+      const li = document.createElement("li");
+      li.className = `message ${msg.senderId === 'admin' ? 'admin' : 'user'}`;
+      li.textContent = msg.content;
+      const messagesList = document.getElementById("messages");
+      messagesList.insertBefore(li, messagesList.firstChild);
+    }
+
+    function appendMessage(msg) {
+      const li = document.createElement("li");
+      li.className = `message ${msg.senderId === 'admin' ? 'admin' : 'user'}`;
+      li.textContent = msg.content;
+      document.getElementById("messages").appendChild(li);
+
+      // Auto scroll xuống dưới khi có tin nhắn mới
+      const chatBox = document.getElementById("chatBox");
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    window.onload = () => {
+      document.getElementById("chatBox").addEventListener("scroll", handleScroll);
+    };
+  </script>
+</body>
+</html>

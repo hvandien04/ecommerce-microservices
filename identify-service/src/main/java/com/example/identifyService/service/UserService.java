@@ -1,9 +1,7 @@
 package com.example.identifyService.service;
 
-import com.example.identifyService.dto.request.IntrospectRequest;
-import com.example.identifyService.dto.request.UserCreateRequest;
-import com.example.identifyService.dto.request.UserUpdatePasswordRequest;
-import com.example.identifyService.dto.request.UserUpdateRequest;
+import com.example.identifyService.dto.request.*;
+import com.example.identifyService.dto.response.UserProfileResponse;
 import com.example.identifyService.dto.response.UserResponse;
 import com.example.identifyService.entity.User;
 import com.example.identifyService.exception.AppException;
@@ -20,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -62,5 +61,16 @@ public class UserService {
         User user = userRepository.findByUsername(username).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
         userMapper.updateUser(user, request);
         return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+    public UserProfileResponse GetInfoByUserId(String userId) {
+        return userRepository.findById(userId).map(userMapper::toUserProfileResponse)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    public List<UserProfileResponse> GetUserInfoByUserId(UserIdsRequest request) {
+        return userRepository.findAllById(request.getUserIds()).stream()
+                .map(userMapper::toUserProfileResponse)
+                .toList();
     }
 }

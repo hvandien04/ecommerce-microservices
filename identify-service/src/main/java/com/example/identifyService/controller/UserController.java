@@ -1,13 +1,17 @@
 package com.example.identifyService.controller;
 
 import com.example.identifyService.dto.request.UserCreateRequest;
+import com.example.identifyService.dto.request.UserIdsRequest;
 import com.example.identifyService.dto.request.UserUpdatePasswordRequest;
 import com.example.identifyService.dto.request.UserUpdateRequest;
 import com.example.identifyService.dto.response.ApiResponse;
+import com.example.identifyService.dto.response.UserProfileResponse;
 import com.example.identifyService.dto.response.UserResponse;
 import com.example.identifyService.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -28,10 +32,24 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping("/{userId}")
+    ApiResponse<UserProfileResponse> getUserById(@PathVariable String userId) {
+        return ApiResponse.<UserProfileResponse>builder()
+                .result(userService.GetInfoByUserId(userId))
+                .build();
+    }
+
     @PutMapping
     ApiResponse<UserResponse> updateUser(@RequestBody UserUpdateRequest request) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.UpdateUser(request))
+                .build();
+    }
+
+    @PostMapping("/batch")
+    ApiResponse<List<UserProfileResponse>>getUserProfile(@RequestBody UserIdsRequest request){
+        return ApiResponse.<List<UserProfileResponse>>builder()
+                .result(userService.GetUserInfoByUserId(request))
                 .build();
     }
 
